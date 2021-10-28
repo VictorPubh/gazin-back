@@ -1,0 +1,29 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Person {
+  id         Int      @id @default(autoincrement())
+  name       String   @db.VarChar(50)
+  email      String   @unique
+  sex        String?
+  age        Int?
+  birthday   DateTime
+  profession String   @default("Developer")
+  password   String
+  company    Company? @relation(fields: [companyId], references: [id])
+
+  createdAt DateTime @default(now())
+  companyId Int
+}
+
+model Company {
+  id     Int      @id @default(autoincrement())
+  name   String   @db.VarChar(50)
+  Person Person[]
+}
