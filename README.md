@@ -35,6 +35,9 @@ $ npm install
 ## Running the app
 
 ```bash
+# docker and docker-compose is required.
+$ docker-compose up -d --force-recreate
+
 # development
 $ npm run start
 
