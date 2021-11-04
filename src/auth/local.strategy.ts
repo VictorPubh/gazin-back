@@ -4,17 +4,11 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ContextIdFactory, ModuleRef } from '@nestjs/core';
 
-import {
-  Person,
-  Prisma
-} from '@prisma/client';
+import { Person, Prisma } from '@prisma/client';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
-  constructor(
-    private authService: AuthService,
-    private moduleref: ModuleRef
-  ) {
+  constructor(private authService: AuthService, private moduleref: ModuleRef) {
     super({
       passReqToCallback: true,
     });
@@ -22,8 +16,8 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 
   async validate(
     request: Request,
-    email: Prisma.PersonWhereUniqueInput,
-    password: string
+    email: string,
+    password: string,
   ): Promise<any> {
     const contextId = ContextIdFactory.getByRequest(request);
     const authService = await this.moduleref.resolve(AuthService, contextId);

@@ -1,21 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import {
-  Company,
-  Prisma
-} from '@prisma/client';
+import { Company, Prisma } from '@prisma/client';
 
-@Injectable ()
+@Injectable()
 export class CompanyService {
   constructor(private prisma: PrismaService) {}
 
-  async company(companyWhereUniqueInput: Prisma.CompanyWhereUniqueInput): Promise<Company | null> {
+  async getCompany(
+    companyWhereUniqueInput: Prisma.CompanyWhereUniqueInput,
+  ): Promise<Company | null> {
     return this.prisma.company.findUnique({
       where: companyWhereUniqueInput,
     });
   }
 
-  async companies(params: {
+  async getCompanies(params: {
     skip?: number;
     take?: number;
     cursor?: Prisma.CompanyWhereUniqueInput;

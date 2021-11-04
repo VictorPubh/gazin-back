@@ -7,7 +7,7 @@ import {
   Put,
   Delete,
   Request,
-  UseGuards
+  UseGuards,
 } from '@nestjs/common';
 
 import { PersonService } from './person/person.service';
@@ -16,7 +16,7 @@ import { AuthService } from './auth/auth.service';
 
 import { AuthGuard } from '@nestjs/passport';
 import { LocalAuthGuard } from './auth/local-auth.guard';
-import { JwtAuthGuard } from './auth/jwt-auth.guard';
+import { JwtAuthGuard, Public } from './auth/jwt-auth.guard';
 
 import { Person as PersonModel } from '@prisma/client';
 import { Company as CompanyModel } from '@prisma/client';
@@ -26,56 +26,69 @@ export class AppController {
   constructor(
     private readonly authService: AuthService,
     private readonly personService: PersonService,
-    private readonly companyService: CompanyService
+    private readonly companyService: CompanyService,
   ) {}
 
+  @Public()
+  @Get('/')
+  async home() {
+    return { message: 'Consulte na Collection do Postman.'}
+  }
+
   // Authentication
-  @UseGuards(LocalAuthGuard)
+  @Public()
   @Post('auth/login')
-  async login(@Request() req) {
-    return this.authService.login(req.user);
+  async login(
+    @Request() req,
+    @Body()
+    postData: {
+      email: string;
+      password: string;
+    },
+  ) {
+    const { email, password } = postData;
+    return this.authService.login(email, password);
   }
 
   // User Profile
-  @UseGuards(JwtAuthGuard)
   @Get('profile')
   getProfile(@Request() req) {
     return req.user;
   }
 
   // Companies
+  @Public()
   @Get('company/:id')
   async getCompanyById(@Param('id') id: number): Promise<CompanyModel> {
-    return this.companyService.company({
-      id: Number(id)
+    return this.companyService.getCompany({
+      id: Number(id),
     });
   }
 
+  @Public()
   @Get('company')
   async getComponies(): Promise<CompanyModel[]> {
-    return this.companyService.companies({})
+    return this.companyService.getCompanies({});
   }
 
   @Post('company')
   async createCompany(
-    @Body() postData: {
-      name: string;
-    }
+    @Body() postData: { name: string },
   ): Promise<CompanyModel> {
     const { name } = postData;
 
     return this.companyService.createCompany({
       name,
-    })
+    });
   }
 
-  @UseGuards(JwtAuthGuard)
   @Put('company/:id')
   async updateCompany(
     @Param('id') id: string,
-    @Body() postData: {
+    @Body()
+    postData: {
       name: string;
-    }
+    },
   ): Promise<CompanyModel> {
     const { name } = postData;
 
@@ -83,51 +96,38 @@ export class AppController {
       data: {
         name,
       },
-      where: { id: Number(id) }
+      where: { id: Number(id) },
     });
   }
 
-  @UseGuards(JwtAuthGuard)
   @Delete('company/:id')
   async deleteCompany(@Param('id') id: string): Promise<CompanyModel> {
     return this.companyService.deleteCompany({ id: Number(id) });
   }
 
   // Developers
-  @Get('developers/:id')
-  async getPersonById(@Param('id') id: number): Promise<PersonModel> {
-    return this.personService.person({
-      id: Number(id)
+  @Public()
+  @Get('developers')
+  async getDevelopers(): Promise<PersonModel[]> {
+    return this.personService.getPeoples({
+      where: { profession: 'Developer' },
     });
   }
 
-  @Get('developers')
-  async getPeoples(): Promise<PersonModel[]> {
-    return this.personService.peoples({
-      where: { profession: 'Developer' }
-    })
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Post('developers')
-  async createPerson(
-    @Body() postData: {
+  @Public()
+  @Post('developer')
+  async createDeveloper(
+    @Body()
+    postData: {
       name?: string;
       email: string;
       password: string;
       sex: string;
       company?: number;
       birthday: string;
-    }
+    },
   ): Promise<PersonModel> {
-    const {
-      name,
-      email,
-      password,
-      sex,
-      company,
-      birthday
-    } = postData;
+    const { name, email, password, sex, company, birthday } = postData;
 
     return this.personService.createPerson({
       name,
@@ -137,32 +137,70 @@ export class AppController {
       birthday,
       profession: 'Developer',
       company: {
-        connect: { id: company }
-      }
-    })
+        connect: { id: company },
+      },
+    });
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Put('developers/:id')
+  // Peoples
+  @Public()
+  @Get('peoples')
+  async getPeoples(): Promise<PersonModel[]> {
+    return this.personService.getPeoples({});
+  }
+
+  @Public()
+  @Get('person/:id')
+  async getPersonById(@Param('id') id: number): Promise<PersonModel> {
+    return this.personService.getPerson({
+      id: Number(id),
+    });
+  }
+
+  @Public()
+  @Post('person')
+  async createPerson(
+    @Body()
+    postData: {
+      name?: string;
+      email: string;
+      password: string;
+      sex: string;
+      company?: number;
+      profession: string;
+      birthday: string;
+    },
+  ): Promise<PersonModel> {
+    const { name, email, password, sex, company, profession, birthday } =
+      postData;
+
+    return this.personService.createPerson({
+      name,
+      email,
+      password,
+      sex,
+      birthday,
+      profession,
+      company: {
+        connect: { id: company },
+      },
+    });
+  }
+
+  @Put('person/:id')
   async updatePerson(
     @Param('id') id: string,
-    @Body() postData: {
+    @Body()
+    postData: {
       password: string;
       name?: string;
       sex?: string;
       birthday?: string;
       company?: number;
       profession?: string;
-    }
+    },
   ): Promise<PersonModel> {
-    const {
-      name,
-      sex,
-      password,
-      birthday,
-      company,
-      profession
-    } = postData;
+    const { name, sex, password, birthday, company, profession } = postData;
 
     return this.personService.updatePerson({
       data: {
@@ -172,15 +210,14 @@ export class AppController {
         password,
         profession,
         company: {
-          connect: { id: company }
-        }
+          connect: { id: company },
+        },
       },
-      where: { id: Number(id) }
+      where: { id: Number(id) },
     });
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Delete('developers/:id')
+  @Delete('person/:id')
   async deletePerson(@Param('id') id: string): Promise<PersonModel> {
     return this.personService.deletePerson({ id: Number(id) });
   }
