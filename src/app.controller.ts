@@ -32,7 +32,10 @@ export class AppController {
   @Public()
   @Get('/')
   async home() {
-    return { message: 'Consulte na Collection do Postman.'}
+    return {
+      message: 'Consulte os endpoints disponíveis através da Coleção do Postman.',
+      collection: 'https://github.com/VictorPubh/gazin-back/blob/main/Gazin.postman_collection.json',
+    };
   }
 
   // Authentication
