@@ -15,7 +15,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Desenvolvedor Gazin\",\n    \"email\": \"desenvolvedor@gazin.com.br\",\n    \"password\": \"123456\",\n    \"profession\": \"Full Stack\",\n    \"sex\": \"male\",\n    \"age\": 21,\n    \"birthday\": \"2001-01-23T00:00:00.000Z\",\n    \"company\": 1\n}",
+							"raw": "{\n    \"name\": \"Desenvolvedor Gazin\",\n    \"email\": \"joaosantana@gazin.com.br\",\n    \"password\": \"123456\",\n    \"profession\": \"Full Stack\",\n    \"sex\": \"male\",\n    \"age\": 21,\n    \"birthday\": \"2001-01-23T00:00:00.000Z\",\n    \"company\": 1\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -43,7 +43,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Desenvolvedor Gazin\",\n    \"email\": \"desenvolvedor@gazin.com.br\",\n    \"password\": \"123456\",\n    \"sex\": \"male\",\n    \"age\": 21,\n    \"birthday\": \"2001-01-23T00:00:00.000Z\",\n    // Necessary to create company\n    \"company\": 1\n}",
+							"raw": "{\n    \"name\": \"Desenvolvedor Gazin\",\n    \"email\": \"desenvolvedor@gazin.com.br\",\n    \"password\": \"123456\",\n    \"sex\": \"male\",\n    \"age\": 21,\n    \"birthday\": \"2001-01-23T00:00:00.000Z\",\n    \"company\": 1\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -70,14 +70,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:3000/developers",
+							"raw": "http://localhost:3000/peoples",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
 							"port": "3000",
 							"path": [
-								"developers"
+								"peoples"
 							]
 						}
 					},
@@ -125,6 +125,16 @@
 				{
 					"name": "Apagar Pessoa por ID",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpvYW9zYW50YW5hQGdhemluLmNvbS5iciIsInN1YiI6MiwiaWF0IjoxNjM2MTUwNDU5LCJleHAiOjE2MzYyMzY4NTl9.BNEWUmmrlcGr8dSgqRhM-K2TE9udQ9dTwRJ8EZOU1EE",
+									"type": "string"
+								}
+							]
+						},
 						"method": "DELETE",
 						"header": [],
 						"url": {
@@ -145,10 +155,29 @@
 				{
 					"name": "Atualizar Pessoa",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpvYW9zYW50YW5hQGdhemluLmNvbS5iciIsInN1YiI6MiwiaWF0IjoxNjM2MTQ4OTEzLCJleHAiOjE2MzYyMzUzMTN9.2mYVSO-BIZsFpYHNPWX-z4nWSQJP9sxi2bwhyjqCbS4",
+									"type": "string"
+								}
+							]
+						},
 						"method": "PUT",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": 6,\n    \"name\": \"João Victor Sant'ana 42\",\n    \"profession\": \"Developer\",\n    \"sex\": \"male\",\n    \"company\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
-							"raw": "http://localhost:3000/person/1",
+							"raw": "http://localhost:3000/person/6",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -156,7 +185,7 @@
 							"port": "3000",
 							"path": [
 								"person",
-								"1"
+								"6"
 							]
 						}
 					},
@@ -315,19 +344,81 @@
 			"response": []
 		},
 		{
-			"name": "Receber Usuário (via JWT)",
+			"name": "Validar Token JWT",
 			"request": {
-				"method": "GET",
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"jwt\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpvYW9zYW50YW5hQGdhemluLmNvbS5iciIsInN1YiI6MiwiaWF0IjoxNjM2MDgyMDU3LCJleHAiOjE2MzYwODIxMTd9.1YorfXx-xnJgERCFeVv1InqeIGpdD0I4Sqhmvw2e6fI\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
-					"raw": "http://localhost:3000/profile",
+					"raw": "http://localhost:3000/auth/validate-token",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "3000",
 					"path": [
-						"profile"
+						"auth",
+						"validate-token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Receber Usuário Logado",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpvYW9zYW50YW5hQGdhemluLmNvbS5iciIsInN1YiI6MiwiaWF0IjoxNjM2MDgyMDU3LCJleHAiOjE2MzYwODIxMTd9.1YorfXx-xnJgERCFeVv1InqeIGpdD0I4Sqhmvw2e6fI",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/auth/validate-token",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"auth",
+						"validate-token"
 					]
 				}
 			},
