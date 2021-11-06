@@ -73,13 +73,14 @@ export class PersonService extends PrismaService {
   }
 
   async createPerson(data: Prisma.PersonCreateInput): Promise<Person> {
-    const { password } = data;
-    const encryptPassword = this.encrypt(password);
-    data.password = encryptPassword;
+    data.password = this.encrypt(data.password);
 
-    return this.person.create({
+    const { ...person } = await this.person.create({
       data,
     });
+
+    person.age = this.calculateAge(person.birthday);
+    return person;
   }
 
   async updatePerson(params: {
