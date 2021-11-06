@@ -10,6 +10,24 @@ export class AuthService extends PersonService {
     super();
   }
 
+  bearerDecode(token: string) {
+    return token ? token.replace('Bearer ', '') : false;
+  }
+
+  async validateToken(token: string) {
+    try {
+      const userToken = await this.jwtService.verify(token);
+      const { email }: Prisma.PersonWhereUniqueInput = userToken;
+      if (email) {
+        const user = await this.getPerson({ email });
+        return user ? user : false;
+      }
+      return false;
+    } catch (err) {
+      return { ...err };
+    }
+  }
+
   async validateUser(email: string, entryPass: string): Promise<any> {
     try {
       const user = await this.getPerson({ email }, true);
@@ -21,9 +39,11 @@ export class AuthService extends PersonService {
         return result;
       }
 
-      return { err: 'Senha incorreta.' };
+      // Incorrect password
+      return { err: 'Senha incorreta.', code: 401 };
     } catch (err) {
-      return { err: 'E-mail não encontrado.', code: 404 };
+      // E-mail not found
+      return { err: 'E-mail não encontrado', code: 404 };
     }
   }
 
@@ -41,10 +61,12 @@ export class AuthService extends PersonService {
       } else {
         return {
           acess_token: this.jwtService.sign(payload),
+          user,
         };
       }
-    } catch (error) {
-      return { error: 'Você não foi autenticado.' };
+    } catch (err) {
+      // Not authenticated
+      return { err: 'Não autenticado.', code: 400 };
     }
   }
 }

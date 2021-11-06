@@ -8,6 +8,7 @@ import {
   Delete,
   Request,
   UseGuards,
+  Res,
 } from '@nestjs/common';
 
 import { PersonService } from './person/person.service';
@@ -20,6 +21,7 @@ import { JwtAuthGuard, Public } from './auth/jwt-auth.guard';
 
 import { Person as PersonModel } from '@prisma/client';
 import { Company as CompanyModel } from '@prisma/client';
+const moment = require('moment');
 
 @Controller()
 export class AppController {
@@ -33,30 +35,55 @@ export class AppController {
   @Get('/')
   async home() {
     return {
-      message: 'Consulte os endpoints disponíveis através da Coleção do Postman.',
-      collection: 'https://github.com/VictorPubh/gazin-back/blob/main/Gazin.postman_collection.json',
+      message:
+        'Consulte os endpoints disponíveis através da Coleção do Postman.',
+      collection:
+        'https://github.com/VictorPubh/gazin-back/blob/main/Gazin.postman_collection.json',
     };
   }
 
   // Authentication
   @Public()
   @Post('auth/login')
-  async login(
-    @Request() req,
-    @Body()
-    postData: {
-      email: string;
-      password: string;
-    },
-  ) {
-    const { email, password } = postData;
-    return this.authService.login(email, password);
+  async login(@Request() req, @Res() res) {
+    const { email, password } = req.body;
+    const dataUser = await this.authService.login(email, password);
+
+    if (dataUser.err) {
+      const { err, code } = dataUser;
+      return res.status(code).json({ err });
+    }
+
+    return res.status(200).json(dataUser);
   }
 
-  // User Profile
-  @Get('profile')
+  @Public()
+  @Post('auth/validate-token')
+  async validateToken(@Res() res, @Request() req) {
+    const bodyJwt = req.body.jwt;
+    const headerJwt = this.authService.bearerDecode(req.headers.authorization);
+
+    const validation = await this.authService.validateToken(
+      bodyJwt || headerJwt,
+    );
+
+    if ((!bodyJwt && !headerJwt) || !validation) {
+      res.status(400).json({
+        err: 'Você precisa definir um Token JWT via Body ou Header (Bearer).',
+      });
+    }
+
+    if (validation.expiredAt) {
+      res.status(410).json(validation);
+    }
+
+    res.status(200).json(validation);
+  }
+
+  // Get User Profile
+  @Get('auth/validate-token')
   getProfile(@Request() req) {
-    return req.user;
+    return this.personService.getPerson({ id: +req.user.userId });
   }
 
   // Companies
@@ -64,7 +91,7 @@ export class AppController {
   @Get('company/:id')
   async getCompanyById(@Param('id') id: number): Promise<CompanyModel> {
     return this.companyService.getCompany({
-      id: Number(id),
+      id: +id,
     });
   }
 
@@ -99,13 +126,13 @@ export class AppController {
       data: {
         name,
       },
-      where: { id: Number(id) },
+      where: { id: +id },
     });
   }
 
   @Delete('company/:id')
   async deleteCompany(@Param('id') id: string): Promise<CompanyModel> {
-    return this.companyService.deleteCompany({ id: Number(id) });
+    return this.companyService.deleteCompany({ id: +id });
   }
 
   // Developers
@@ -156,7 +183,7 @@ export class AppController {
   @Get('person/:id')
   async getPersonById(@Param('id') id: number): Promise<PersonModel> {
     return this.personService.getPerson({
-      id: Number(id),
+      id: +id,
     });
   }
 
@@ -182,10 +209,10 @@ export class AppController {
       email,
       password,
       sex,
-      birthday,
+      birthday: moment(birthday).format(),
       profession,
       company: {
-        connect: { id: company },
+        connect: { id: +company },
       },
     });
   }
@@ -216,12 +243,12 @@ export class AppController {
           connect: { id: company },
         },
       },
-      where: { id: Number(id) },
+      where: { id: +id },
     });
   }
 
   @Delete('person/:id')
   async deletePerson(@Param('id') id: string): Promise<PersonModel> {
-    return this.personService.deletePerson({ id: Number(id) });
+    return this.personService.deletePerson({ id: +id });
   }
 }

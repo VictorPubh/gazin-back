@@ -18,7 +18,7 @@ import { PrismaClient } from '.prisma/client';
     JwtModule.register({
       secret: jwtConstants.secret,
       signOptions: {
-        expiresIn: '60s',
+        expiresIn: '86400s',
       },
     }),
   ],

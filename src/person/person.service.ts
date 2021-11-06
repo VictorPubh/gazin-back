@@ -87,10 +87,13 @@ export class PersonService extends PrismaService {
     data: Prisma.PersonUpdateInput;
   }): Promise<Person> {
     const { where, data } = params;
-    return this.person.update({
+    const updatePerson = await this.person.update({
       data,
       where,
     });
+
+    updatePerson.age = this.calculateAge(updatePerson.birthday);
+    return updatePerson;
   }
 
   async deletePerson(where: Prisma.PersonWhereUniqueInput): Promise<Person> {
