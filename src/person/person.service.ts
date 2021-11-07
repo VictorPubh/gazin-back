@@ -74,6 +74,7 @@ export class PersonService extends PrismaService {
 
   async createPerson(data: Prisma.PersonCreateInput): Promise<Person> {
     data.password = this.encrypt(data.password);
+    data.age = this.calculateAge(new Date(data.birthday));
 
     const { ...person } = await this.person.create({
       data,
