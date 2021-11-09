@@ -35,6 +35,10 @@ export class PersonService extends PrismaService {
   ): Promise<Person | null> {
     const person = await this.person.findUnique({
       where: personWhereUniqueInput,
+      include: {
+        company: true,
+        hobbies: true,
+      },
     });
 
     const { birthday } = person;
@@ -58,10 +62,15 @@ export class PersonService extends PrismaService {
       cursor,
       where,
       orderBy,
+      include: {
+        company: true,
+        hobbies: true,
+      },
     });
 
     result.map(async (person) => {
       person.password = undefined;
+      person.companyId = undefined;
       person.age = this.calculateAge(person.birthday);
     });
 
@@ -74,6 +83,10 @@ export class PersonService extends PrismaService {
 
     const { ...person } = await this.person.create({
       data,
+      include: {
+        company: true,
+        hobbies: true,
+      },
     });
 
     person.age = this.calculateAge(person.birthday);
@@ -88,6 +101,10 @@ export class PersonService extends PrismaService {
     const updatePerson = await this.person.update({
       data,
       where,
+      include: {
+        company: true,
+        hobbies: true,
+      },
     });
 
     updatePerson.age = this.calculateAge(updatePerson.birthday);

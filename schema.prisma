@@ -40,8 +40,7 @@ model Hobby {
   name       String           @db.VarChar(50)
   category   HobbiesCategory? @relation(fields: [categoryId], references: [id])
   categoryId Int?
-  Person     Person?          @relation(fields: [personId], references: [id])
-  personId   Int?
+  Person     Person[]
 }
 
 model HobbiesCategory {

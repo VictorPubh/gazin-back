@@ -63,13 +63,17 @@ export class HobbyController extends HobbyService {
     @Body()
     postData: {
       name: string;
+      category?: number;
     },
   ): Promise<Hobby> {
-    const { name } = postData;
+    const { name, category } = postData;
 
     return this.updateHobby({
       data: {
         name,
+        category: {
+          connect: { id: category },
+        },
       },
       where: { id: +id },
     });

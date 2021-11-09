@@ -4,6 +4,8 @@ import { Company, Prisma } from '@prisma/client';
 
 @Injectable()
 export class CompanyService {
+  companies: Company[];
+
   constructor(private prisma: PrismaService) {}
 
   async getCompany(
@@ -22,6 +24,7 @@ export class CompanyService {
     orderBy?: Prisma.CompanyOrderByWithRelationInput;
   }): Promise<Company[]> {
     const { skip, take, cursor, where, orderBy } = params;
+
     return this.prisma.company.findMany({
       skip,
       take,
