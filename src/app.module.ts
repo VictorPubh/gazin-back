@@ -10,9 +10,16 @@ import { CompanyService } from './company/company.service';
 import { CompanyModule } from './company/company.module';
 import { PersonService } from './person/person.service';
 import { PersonModule } from './person/person.module';
+import { HobbyModule } from './person/hobby/hobby.module';
 
 @Module({
-  imports: [PrismaService, AuthModule, CompanyModule, PersonModule],
+  imports: [
+    PrismaService,
+    AuthModule,
+    CompanyModule,
+    PersonModule,
+    HobbyModule,
+  ],
   controllers: [AppController],
   providers: [
     PersonService,

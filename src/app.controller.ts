@@ -21,6 +21,8 @@ import { JwtAuthGuard, Public } from './auth/jwt-auth.guard';
 
 import { Person as PersonModel } from '@prisma/client';
 import { Company as CompanyModel } from '@prisma/client';
+import { HobbyService } from './person/hobby/hobby.service';
+
 const moment = require('moment');
 
 @Controller()

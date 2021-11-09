@@ -7,10 +7,6 @@ const moment = require('moment');
 
 @Injectable()
 export class PersonService extends PrismaService {
-  constructor() {
-    super();
-  }
-
   // Encrypt
   encrypt(value: string): string {
     return CryptoJS.AES.encrypt(
