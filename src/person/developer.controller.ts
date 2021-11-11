@@ -3,9 +3,11 @@ import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/auth/jwt-auth.guard';
 import { PrismaService } from 'src/prisma.service';
-import { AddNewPerson } from './dto/add-new-person.dto';
-import { responseCreatedPerson } from './dto/reponse-person.dto';
-import { respondeDeveloper } from './dto/responde-developer.dto';
+import { AddNewPerson } from './dto/person.dto';
+import {
+  ResponseCreatedPerson,
+  ResponsePerson,
+} from './dto/reponse-person.dto';
 import { PersonService } from './person.service';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -24,7 +26,7 @@ export class DeveloperController extends PrismaService {
   @ApiResponse({
     status: 200,
     description: 'Pessoas Desenvolvedoras Recebido com sucesso!',
-    type: respondeDeveloper,
+    type: ResponsePerson,
     isArray: true,
   })
   @ApiParam({ name: 'skip', type: 'number', required: false })
@@ -50,7 +52,7 @@ export class DeveloperController extends PrismaService {
   @ApiResponse({
     status: 201,
     description: 'Pessoa Desenvolvedora criado com sucesso!',
-    type: responseCreatedPerson,
+    type: ResponseCreatedPerson,
   })
   @ApiResponse({
     status: 400,

@@ -14,6 +14,13 @@ import {
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/auth/jwt-auth.guard';
 import { PrismaService } from 'src/prisma.service';
+import { AddNewPerson } from './dto/person.dto';
+import { BadRequestPerson } from './dto/bad-request-person.dto';
+import { UpdatePerson } from './dto/person.dto';
+import {
+  ResponseCreatedPerson,
+  ResponsePerson,
+} from './dto/reponse-person.dto';
 import { PersonEntity } from './entity/person.entity';
 import { PersonService } from './person.service';
 
@@ -55,33 +62,39 @@ export class PersonController extends PrismaService {
   }
 
   @Public()
-  @Get('/:id')
-  async getPersonById(@Param('id') id: number): Promise<Person> {
+  @Get(':id')
+  @ApiOperation({ summary: 'Receber Pessoa por ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Receber Objeto de Pessoa',
+    type: ResponsePerson,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Nenhuma Pessoa encontrado',
+    type: BadRequestPerson,
+  })
+  async getPersonById(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<Person | any> {
     return this.personService.getPerson({
-      id: +id,
+      id,
     });
   }
 
   @Public()
   @Post('/')
-  async createPerson(
-    @Body()
-    postData: {
-      name?: string;
-      email: string;
-      password: string;
-      sex: string;
-      company?: number;
-      profession: string;
-      birthday: string;
-      hobbies: [
-        {
-          id: number;
-          name: string;
-        },
-      ];
-    },
-  ): Promise<Person> {
+  @ApiOperation({ summary: 'Criar uma Pessoa' })
+  @ApiResponse({
+    status: 201,
+    description: 'Pessoa Criado com sucesso!',
+    type: ResponseCreatedPerson,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Argumentos inválidos!',
+  })
+  async createPerson(@Body() addNewPerson: AddNewPerson): Promise<Person> {
     const {
       name,
       email,
@@ -91,15 +104,7 @@ export class PersonController extends PrismaService {
       profession,
       birthday,
       hobbies,
-    } = postData;
-
-    /* 
-        TODO: Relationship to receive more than one Hobby at a time.
-    */
-
-    // const hobbiesId = hobbies.map(({ id }) => {
-    //   id;
-    // });
+    } = addNewPerson;
 
     return this.personService.createPerson({
       name,
@@ -122,38 +127,42 @@ export class PersonController extends PrismaService {
     });
   }
 
-  @Put('/|/:id')
+  @Put(':id')
+  @ApiOperation({ summary: 'Atualizar Pessoa' })
+  @ApiResponse({
+    status: 200,
+    description: 'Pessoa Atualizado com sucesso!',
+    type: ResponsePerson,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Argumentos inválidos!',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Pessoa não encontrado.',
+    type: BadRequestPerson,
+  })
+  @ApiParam({
+    name: 'id',
+    type: 'number',
+    required: true,
+  })
   async updatePerson(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body()
-    postData: {
-      id?: number;
-      password: string;
-      name?: string;
-      email?: string;
-      sex?: string;
-      birthday?: string;
-      company?: number;
-      profession?: string;
-      hobbies: [
-        {
-          id: number;
-          name: string;
-        },
-      ];
-    },
+    updatePerson: UpdatePerson,
   ): Promise<Person> {
     const {
       id: postId,
       name,
       sex,
-      email,
       password,
       birthday,
       company,
       profession,
       hobbies,
-    } = postData;
+    } = updatePerson;
 
     return this.personService.updatePerson({
       data: {
@@ -164,7 +173,7 @@ export class PersonController extends PrismaService {
         profession,
         company: company
           ? {
-              connect: { id: company },
+              connect: { id: +company },
             }
           : undefined,
         hobbies: {
@@ -176,7 +185,7 @@ export class PersonController extends PrismaService {
           }),
         },
       },
-      where: id ? { id: +id } : { email },
+      where: { id: +id },
     });
   }
 

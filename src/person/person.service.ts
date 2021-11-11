@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { Person, Prisma } from '@prisma/client';
 
@@ -34,19 +38,27 @@ export class PersonService extends PrismaService {
     personWhereUniqueInput: Prisma.PersonWhereUniqueInput,
     full = false,
   ): Promise<Person | null> {
-    const person = await this.person.findUnique({
-      where: personWhereUniqueInput,
-      include: {
-        company: true,
-        hobbies: true,
-      },
-    });
+    try {
+      const person = await this.person.findUnique({
+        where: personWhereUniqueInput,
+        include: {
+          company: true,
+          hobbies: true,
+        },
+      });
 
-    const { birthday } = person;
-    person.age = this.calculateAge(birthday);
-    if (!full) person.password = undefined;
+      if (person) {
+        const { birthday } = person;
+        person.age = this.calculateAge(birthday);
+        if (!full) person.password = undefined;
 
-    return person;
+        return person;
+      } else {
+        throw new NotFoundException('Nenhum encontrado.');
+      }
+    } catch (error) {
+      throw new NotFoundException(error.message);
+    }
   }
 
   async getPeoples(params: {
@@ -98,18 +110,22 @@ export class PersonService extends PrismaService {
     where: Prisma.PersonWhereUniqueInput;
     data: Prisma.PersonUpdateInput;
   }): Promise<Person> {
-    const { where, data } = params;
-    const updatePerson = await this.person.update({
-      data,
-      where,
-      include: {
-        company: true,
-        hobbies: true,
-      },
-    });
+    try {
+      const { where, data } = params;
+      const updatePerson = await this.person.update({
+        data,
+        where,
+        include: {
+          company: true,
+          hobbies: true,
+        },
+      });
 
-    updatePerson.age = this.calculateAge(updatePerson.birthday);
-    return updatePerson;
+      updatePerson.age = this.calculateAge(updatePerson.birthday);
+      return updatePerson;
+    } catch (error) {
+      throw new BadRequestException();
+    }
   }
 
   async deletePerson(where: Prisma.PersonWhereUniqueInput): Promise<Person> {
