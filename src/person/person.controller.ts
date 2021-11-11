@@ -4,13 +4,17 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
+  ParseIntPipe,
   Post,
   Put,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/auth/jwt-auth.guard';
 import { PrismaService } from 'src/prisma.service';
+import { PersonEntity } from './entity/person.entity';
 import { PersonService } from './person.service';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -167,15 +171,15 @@ export class PersonController extends PrismaService {
     });
   }
 
-  @Delete('/|/:id')
-  async deletePerson(
-    @Param('id') id: string,
-    @Body()
-    postBody: {
-      id?: number;
-    },
-  ): Promise<Person> {
-    const { id: postId } = postBody;
-    return this.personService.deletePerson({ id: +id || postId });
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Remover uma Pessoa' })
+  @ApiResponse({ status: 204, description: 'Pessoa removida com sucesso' })
+  @ApiResponse({
+    status: 404,
+    description: 'Pessoa não foi encontrada',
+  })
+  async deletePerson(@Param('id', ParseIntPipe) id: number) {
+    await this.personService.deletePerson({ id });
   }
 }

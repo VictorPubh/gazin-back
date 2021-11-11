@@ -1,9 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { CompanyEntity } from 'src/company/entity/company.entity';
 import { HobbiesEntity } from './hobbies.entity';
-import { IsEmail, IsNotEmpty } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsDate, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class PersonEntity {
+  @IsString()
   name: string;
 
   @IsEmail()
@@ -11,25 +13,18 @@ export class PersonEntity {
 
   @IsNotEmpty()
   password: string;
+
+  @IsString()
   sex: string;
 
-  @ApiProperty({
-    type: CompanyEntity,
-  })
-  company?: {
-    id: number;
-    name: string;
-  };
+  company?: CompanyEntity;
+
+  @IsDate()
+  @Type(() => Date)
   birthday: string;
 
   @ApiProperty({
-    type: HobbiesEntity,
     isArray: true,
   })
-  hobbies: [
-    {
-      id: number;
-      name: string;
-    },
-  ];
+  hobbies: HobbiesEntity;
 }
