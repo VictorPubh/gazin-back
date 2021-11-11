@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma.service';
 import { Person, Prisma } from '@prisma/client';
 
 import * as CryptoJS from 'crypto-js';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const moment = require('moment');
 
 @Injectable()

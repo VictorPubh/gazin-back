@@ -1,5 +1,6 @@
-import { Controller, Get, Post, Request, Res } from '@nestjs/common';
+import { Body, Controller, Get, Post, Request, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { SignIn } from './dto/signIn.dto';
 import { Public } from './jwt-auth.guard';
 
 @Controller('auth')
@@ -9,9 +10,8 @@ export class AuthController {
   // Authentication
   @Public()
   @Post('/login')
-  async login(@Request() req, @Res() res) {
-    const { email, password } = req.body;
-    const dataUser = await this.service.login(email, password);
+  async login(@Body() signIn: SignIn, @Res() res) {
+    const dataUser = await this.service.login(signIn);
 
     if (dataUser.err) {
       const { err, code } = dataUser;
@@ -24,22 +24,22 @@ export class AuthController {
   @Public()
   @Post('/validate-token')
   async validateToken(@Res() res, @Request() req) {
-    const bodyJwt = req.body.jwt;
+    const { jwt: bodyJwt } = req.body;
     const headerJwt = this.service.bearerDecode(req.headers.authorization);
 
     const validation = await this.service.validateToken(bodyJwt || headerJwt);
 
     if ((!bodyJwt && !headerJwt) || !validation) {
-      res.status(400).json({
-        err: 'Você precisa definir um Token JWT via Body ou Header (Bearer).',
+      return res.status(400).json({
+        err: 'Você precisa definir um Token JWT via Body (with { "jwt": "..."}) ou Header (with "Bearer ...").',
       });
     }
 
     if (validation.expiredAt) {
-      res.status(410).json(validation);
+      return res.status(410).json(validation);
     }
 
-    res.status(200).json(validation);
+    return res.status(200).json(validation);
   }
 
   // Get User Profile

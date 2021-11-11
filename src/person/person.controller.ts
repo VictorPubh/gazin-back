@@ -8,19 +8,21 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/auth/jwt-auth.guard';
 import { PrismaService } from 'src/prisma.service';
 import { PersonService } from './person.service';
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const moment = require('moment');
 
 @Controller('person')
+@ApiTags('Person')
 export class PersonController extends PrismaService {
   constructor(private readonly personService: PersonService) {
     super();
   }
 
-  // Peoples
   @Public()
   @Get('/')
   async getPeoples(
@@ -107,13 +109,15 @@ export class PersonController extends PrismaService {
     });
   }
 
-  @Put('/:id')
+  @Put('/|/:id')
   async updatePerson(
     @Param('id') id: string,
     @Body()
     postData: {
+      id?: number;
       password: string;
       name?: string;
+      email?: string;
       sex?: string;
       birthday?: string;
       company?: number;
@@ -126,8 +130,17 @@ export class PersonController extends PrismaService {
       ];
     },
   ): Promise<Person> {
-    const { name, sex, password, birthday, company, profession, hobbies } =
-      postData;
+    const {
+      id: postId,
+      name,
+      sex,
+      email,
+      password,
+      birthday,
+      company,
+      profession,
+      hobbies,
+    } = postData;
 
     return this.personService.updatePerson({
       data: {
@@ -136,24 +149,33 @@ export class PersonController extends PrismaService {
         birthday,
         password,
         profession,
-        company: {
-          connect: { id: company },
-        },
+        company: company
+          ? {
+              connect: { id: company },
+            }
+          : undefined,
         hobbies: {
           connectOrCreate: hobbies.map(({ id, name }) => {
             return {
-              where: { id },
+              where: { id: +id || +postId },
               create: { name },
             };
           }),
         },
       },
-      where: { id: +id },
+      where: id ? { id: +id } : { email },
     });
   }
 
-  @Delete('/:id')
-  async deletePerson(@Param('id') id: string): Promise<Person> {
-    return this.personService.deletePerson({ id: +id });
+  @Delete('/|/:id')
+  async deletePerson(
+    @Param('id') id: string,
+    @Body()
+    postBody: {
+      id?: number;
+    },
+  ): Promise<Person> {
+    const { id: postId } = postBody;
+    return this.personService.deletePerson({ id: +id || postId });
   }
 }

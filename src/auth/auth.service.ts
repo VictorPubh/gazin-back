@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 
 import { Person, Prisma } from '@prisma/client';
 import { PersonService } from 'src/person/person.service';
+import { SignIn } from './dto/signIn.dto';
 
 @Injectable()
 export class AuthService extends PersonService {
@@ -28,45 +29,45 @@ export class AuthService extends PersonService {
     }
   }
 
-  async validateUser(email: string, entryPass: string): Promise<any> {
+  async validateUser(entrySignIn: SignIn): Promise<any> {
     try {
-      const user = await this.getPerson({ email }, true);
+      const user = await this.getPerson({ email: entrySignIn.email }, true);
       const decryptPass: string = this.decrypt(user.password);
 
-      if (decryptPass == entryPass) {
+      if (decryptPass == entrySignIn.password) {
         const { password, ...result } = user;
 
         return result;
       }
 
       // Incorrect password
-      return { err: 'Senha incorreta.', code: 401 };
+      return { err: 'Senha incorreta.', statusCode: 401 };
     } catch (err) {
       // E-mail not found
-      return { err: 'E-mail não encontrado', code: 404 };
+      return { err: 'E-mail não encontrado', statusCode: 404 };
     }
   }
 
-  async login(email: string, entryPass: string) {
+  async login(signIn: SignIn) {
     try {
-      const user = await this.validateUser(email, entryPass);
+      const result = await this.validateUser(signIn);
 
       const payload = {
-        email: user.email,
-        sub: user.id,
+        email: result.email,
+        sub: result.id,
       };
 
-      if (user.err) {
-        return user;
+      if (result.err) {
+        return result;
       } else {
         return {
           acess_token: this.jwtService.sign(payload),
-          user,
+          user: result,
         };
       }
     } catch (err) {
       // Not authenticated
-      return { err: 'Não autenticado.', code: 400 };
+      return { err: 'Não autenticado.', statusCode: 400 };
     }
   }
 }

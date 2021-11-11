@@ -25,10 +25,10 @@ import { HobbyModule } from './person/hobby/hobby.module';
     PersonService,
     PrismaService,
     CompanyService,
-    {
-      provide: APP_GUARD,
-      useClass: JwtAuthGuard,
-    },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: JwtAuthGuard,
+    // },
   ],
   exports: [PrismaService],
 })

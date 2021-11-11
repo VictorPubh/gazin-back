@@ -12,31 +12,13 @@ import { Public } from 'src/auth/jwt-auth.guard';
 import { HobbyService } from '../hobby.service';
 import { CategoryService } from './category.service';
 
-@Controller('hobbies')
+@Controller('category|categories|hobbies-category')
 export class CategoryController extends CategoryService {
   constructor(private readonly hobbyServices: HobbyService) {
     super();
   }
 
-  @Public()
-  @Get('/')
-  async getAllHobbies(
-    @Param('skip') skip: number,
-    @Param('take') take: number,
-    @Param('cursor') cursor: Prisma.HobbiesCategoryWhereUniqueInput,
-    @Param('where') where: Prisma.HobbiesCategoryWhereInput,
-    @Param('orderBy') orderBy: Prisma.HobbiesCategoryOrderByWithRelationInput,
-  ) {
-    return this.hobbyServices.getHobbies({
-      skip,
-      take,
-      cursor,
-      where,
-      orderBy,
-    });
-  }
-
-  @Put('category/:id')
+  @Put('/:id')
   async updateCategoryById(
     @Param('id') id: string,
     @Body()
@@ -54,7 +36,7 @@ export class CategoryController extends CategoryService {
     });
   }
 
-  @Post('/category')
+  @Post('/')
   async addCategory(
     @Body()
     postData: {
@@ -69,7 +51,7 @@ export class CategoryController extends CategoryService {
   }
 
   @Public()
-  @Get('/category')
+  @Get('/')
   async getAllCategories(
     @Param('skip') skip: number,
     @Param('take') take: number,
@@ -86,7 +68,7 @@ export class CategoryController extends CategoryService {
     });
   }
 
-  @Delete('category/:id')
+  @Delete('/:id')
   async deleteHobbyById(@Param('id') id: string): Promise<HobbiesCategory> {
     return this.deleteCategory({ id: +id });
   }

@@ -11,10 +11,10 @@ import {
 import { Public } from 'src/auth/jwt-auth.guard';
 import { HobbyService } from './hobby.service';
 
-@Public()
-@Controller()
+@Controller('hobby|hobbies')
 export class HobbyController extends HobbyService {
-  @Get('/hobby')
+  @Public()
+  @Get('/')
   async getAll(
     @Param('skip') skip: number,
     @Param('take') take: number,
@@ -31,7 +31,7 @@ export class HobbyController extends HobbyService {
     });
   }
 
-  @Post('/hobby')
+  @Post('/')
   async addHobby(
     @Body()
     postData: {
@@ -50,14 +50,14 @@ export class HobbyController extends HobbyService {
   }
 
   @Public()
-  @Get('hobby/:id')
+  @Get('/:id')
   async getById(@Param('id') id: number): Promise<Hobby> {
     return this.getHobby({
       id: +id,
     });
   }
 
-  @Put('hobby/:id')
+  @Put('/:id')
   async updateHobbyName(
     @Param('id') id: string,
     @Body()
@@ -79,7 +79,7 @@ export class HobbyController extends HobbyService {
     });
   }
 
-  @Delete('hobby/:id')
+  @Delete('/:id')
   async deleteHobbyById(@Param('id') id: string): Promise<Hobby> {
     return this.deleteHobby({ id: +id });
   }
