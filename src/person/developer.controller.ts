@@ -1,10 +1,10 @@
-import { Person } from '.prisma/client';
-import { Body, Controller, Get, Post } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Person, Prisma } from '.prisma/client';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/auth/jwt-auth.guard';
 import { PrismaService } from 'src/prisma.service';
 import { AddNewPerson } from './dto/add-new-person.dto';
-import { responseCreatedDeveloper } from './dto/reponse-created-developer.dto';
+import { responseCreatedPerson } from './dto/reponse-person.dto';
 import { respondeDeveloper } from './dto/responde-developer.dto';
 import { PersonService } from './person.service';
 
@@ -27,9 +27,20 @@ export class DeveloperController extends PrismaService {
     type: respondeDeveloper,
     isArray: true,
   })
-  async getDevelopers(): Promise<Person[]> {
+  @ApiParam({ name: 'skip', type: 'number', required: false })
+  @ApiParam({ name: 'take', type: 'number', required: false })
+  async getDevelopers(
+    @Param('cursor') cursor?: Prisma.PersonWhereUniqueInput,
+    @Param('orderBy') orderBy?: Prisma.PersonOrderByWithRelationInput,
+    @Param('skip') skip?: number,
+    @Param('take') take?: number,
+  ): Promise<Person[]> {
     return this.personService.getPeoples({
       where: { profession: 'Developer' },
+      cursor,
+      orderBy,
+      skip,
+      take,
     });
   }
 
@@ -39,7 +50,7 @@ export class DeveloperController extends PrismaService {
   @ApiResponse({
     status: 201,
     description: 'Pessoa Desenvolvedora criado com sucesso!',
-    type: responseCreatedDeveloper,
+    type: responseCreatedPerson,
   })
   @ApiResponse({
     status: 400,

@@ -11,7 +11,7 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/auth/jwt-auth.guard';
 import { PrismaService } from 'src/prisma.service';
 import { PersonEntity } from './entity/person.entity';
@@ -28,20 +28,29 @@ export class PersonController extends PrismaService {
   }
 
   @Public()
-  @Get('/')
+  @Get()
+  @ApiOperation({ summary: 'Receber lista de pessoas' })
+  @ApiResponse({
+    status: 200,
+    description: 'Pessoas Recebido com sucesso!',
+    type: PersonEntity,
+    isArray: true,
+  })
+  @ApiParam({ name: 'skip', type: 'number', required: false })
+  @ApiParam({ name: 'take', type: 'number', required: false })
   async getPeoples(
-    @Param('skip') skip: number,
-    @Param('take') take: number,
-    @Param('cursor') cursor: Prisma.PersonWhereUniqueInput,
-    @Param('where') where: Prisma.PersonWhereInput,
-    @Param('orderBy') orderBy: Prisma.PersonOrderByWithRelationInput,
+    @Param('where') where?: Prisma.PersonWhereInput,
+    @Param('cursor') cursor?: Prisma.PersonWhereUniqueInput,
+    @Param('orderBy') orderBy?: Prisma.PersonOrderByWithRelationInput,
+    @Param('skip') skip?: number,
+    @Param('take') take?: number,
   ): Promise<Person[]> {
     return this.personService.getPeoples({
+      where,
+      cursor,
+      orderBy,
       skip,
       take,
-      cursor,
-      where,
-      orderBy,
     });
   }
 

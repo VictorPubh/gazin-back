@@ -26,5 +26,5 @@ export class PersonEntity {
   @ApiProperty({
     isArray: true,
   })
-  hobbies: HobbiesEntity;
+  hobbies: HobbiesEntity[];
 }
