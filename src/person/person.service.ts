@@ -128,9 +128,13 @@ export class PersonService extends PrismaService {
     }
   }
 
-  async deletePerson(where: Prisma.PersonWhereUniqueInput): Promise<Person> {
-    return this.person.delete({
-      where,
-    });
+  async deletePerson(where: Prisma.PersonWhereUniqueInput) {
+    try {
+      await this.person.delete({
+        where,
+      });
+    } catch (err) {
+      throw new NotFoundException();
+    }
   }
 }

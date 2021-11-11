@@ -15,7 +15,7 @@ import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/auth/jwt-auth.guard';
 import { PrismaService } from 'src/prisma.service';
 import { AddNewPerson } from './dto/person.dto';
-import { BadRequestPerson } from './dto/bad-request-person.dto';
+import { BadRequestPerson, NotFoundPerson } from './dto/bad-request-person.dto';
 import { UpdatePerson } from './dto/person.dto';
 import {
   ResponseCreatedPerson,
@@ -137,11 +137,12 @@ export class PersonController extends PrismaService {
   @ApiResponse({
     status: 400,
     description: 'Argumentos inválidos!',
+    type: BadRequestPerson,
   })
   @ApiResponse({
     status: 404,
     description: 'Pessoa não encontrado.',
-    type: BadRequestPerson,
+    type: NotFoundPerson,
   })
   @ApiParam({
     name: 'id',
@@ -196,6 +197,7 @@ export class PersonController extends PrismaService {
   @ApiResponse({
     status: 404,
     description: 'Pessoa não foi encontrada',
+    type: NotFoundPerson,
   })
   async deletePerson(@Param('id', ParseIntPipe) id: number) {
     await this.personService.deletePerson({ id });

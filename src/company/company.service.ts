@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { Company, Prisma } from '@prisma/client';
 
@@ -11,9 +15,12 @@ export class CompanyService {
   async getCompany(
     companyWhereUniqueInput: Prisma.CompanyWhereUniqueInput,
   ): Promise<Company | null> {
-    return this.prisma.company.findUnique({
+    const companies = await this.prisma.company.findUnique({
       where: companyWhereUniqueInput,
     });
+
+    if (!companies) throw new NotFoundException();
+    return companies;
   }
 
   async getCompanies(params: {
@@ -44,16 +51,27 @@ export class CompanyService {
     where: Prisma.CompanyWhereUniqueInput;
     data: Prisma.CompanyUpdateInput;
   }): Promise<Company> {
-    const { where, data } = params;
-    return this.prisma.company.update({
-      data,
-      where,
-    });
+    try {
+      const { where, data } = params;
+      const company = this.prisma.company.update({
+        data,
+        where,
+      });
+
+      if (!company) throw new NotFoundException();
+      return company;
+    } catch (err) {
+      throw new BadRequestException(err.message);
+    }
   }
 
   async deleteCompany(where: Prisma.CompanyWhereUniqueInput): Promise<Company> {
-    return this.prisma.company.delete({
-      where,
-    });
+    try {
+      return await this.prisma.company.delete({
+        where,
+      });
+    } catch (err) {
+      throw new NotFoundException();
+    }
   }
 }

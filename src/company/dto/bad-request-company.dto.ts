@@ -1,22 +1,22 @@
 import { IsNumber, IsString, IsArray } from 'class-validator';
 
-export class NotFoundPerson {
-  @IsNumber({})
+export class BadRequestCompany {
+  @IsNumber()
   statusCode: number;
 
-  @IsString()
-  message: string;
+  @IsArray()
+  message: string[];
 
   @IsString()
   error: string;
 }
 
-export class BadRequestPerson {
-  @IsNumber({})
+export class NotFoundCompany {
+  @IsNumber()
   statusCode: number;
 
-  @IsArray()
-  message: string[];
+  @IsString()
+  message: string;
 
   @IsString()
   error: string;
