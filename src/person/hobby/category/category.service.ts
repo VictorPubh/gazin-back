@@ -13,8 +13,8 @@ export class CategoryService extends PrismaService {
   }): Promise<HobbiesCategory[]> {
     const { skip, take, cursor, where, orderBy } = params;
     return await this.hobbiesCategory.findMany({
-      skip,
-      take,
+      skip: skip ? skip : undefined,
+      take: take ? take : undefined,
       cursor,
       where,
       orderBy,

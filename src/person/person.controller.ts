@@ -113,14 +113,23 @@ export class PersonController extends PrismaService {
       sex,
       birthday: moment(birthday).format(),
       profession,
-      company: {
-        connect: { id: +company },
-      },
+      company: company
+        ? {
+            connect: { id: +company },
+          }
+        : {
+            connectOrCreate: {
+              where: {
+                id: 1,
+              },
+              create: { name: 'Gazin' },
+            },
+          },
       hobbies: {
         connectOrCreate: hobbies.map(({ id, name }) => {
           return {
             where: { id },
-            create: { name },
+            create: { id, name },
           };
         }),
       },
