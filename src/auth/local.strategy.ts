@@ -5,6 +5,7 @@ import { AuthService } from './auth.service';
 import { ContextIdFactory, ModuleRef } from '@nestjs/core';
 
 import { Person, Prisma } from '@prisma/client';
+import { SignIn } from './dto/signIn.dto';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
@@ -14,15 +15,11 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(
-    request: Request,
-    email: string,
-    password: string,
-  ): Promise<any> {
+  async validate(request: Request, entrySignIn: SignIn): Promise<any> {
     const contextId = ContextIdFactory.getByRequest(request);
     const authService = await this.moduleref.resolve(AuthService, contextId);
 
-    const user = await this.authService.validateUser(email, password);
+    const user = await this.authService.validateUser(entrySignIn);
     if (!user) {
       throw new UnauthorizedException();
     }

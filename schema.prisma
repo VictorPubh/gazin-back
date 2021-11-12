@@ -7,6 +7,8 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// Person
+
 model Person {
   id         Int      @id @default(autoincrement())
   name       String   @db.VarChar(50)
@@ -17,13 +19,32 @@ model Person {
   profession String   @default("Developer")
   password   String
   company    Company? @relation(fields: [companyId], references: [id])
+  hobbies    Hobby[]
 
   createdAt DateTime @default(now())
   companyId Int
 }
 
+// Companies
+
 model Company {
   id     Int      @id @default(autoincrement())
   name   String   @db.VarChar(50)
   Person Person[]
+}
+
+// Hobbies
+
+model Hobby {
+  id         Int              @id @default(autoincrement())
+  name       String           @db.VarChar(50)
+  category   HobbiesCategory? @relation(fields: [categoryId], references: [id])
+  categoryId Int?
+  Person     Person[]
+}
+
+model HobbiesCategory {
+  id    Int     @id @default(autoincrement())
+  name  String  @db.VarChar(50)
+  Hobby Hobby[]
 }

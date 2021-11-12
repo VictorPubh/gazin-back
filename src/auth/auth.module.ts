@@ -9,6 +9,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './jwt.strategy';
 import { jwtConstants } from './constants';
 import { PrismaClient } from '.prisma/client';
+import { AuthController } from './auth.controller';
 
 @Module({
   imports: [
@@ -24,5 +25,6 @@ import { PrismaClient } from '.prisma/client';
   ],
   providers: [AuthService, LocalStrategy, JwtStrategy, PersonService],
   exports: [AuthService],
+  controllers: [AuthController],
 })
 export class AuthModule {}
