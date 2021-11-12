@@ -151,15 +151,12 @@ export class PersonController extends PrismaService {
   })
   async updatePerson(
     @Param('id', ParseIntPipe) id: number,
-    @Body()
-    updatePerson: UpdatePerson,
+    @Body() updatePerson: UpdatePerson,
   ): Promise<Person> {
     const {
       id: postId,
       name,
       sex,
-      password,
-      birthday,
       company,
       profession,
       hobbies,
@@ -169,8 +166,6 @@ export class PersonController extends PrismaService {
       data: {
         name,
         sex,
-        birthday,
-        password,
         profession,
         company: company
           ? {
@@ -191,7 +186,7 @@ export class PersonController extends PrismaService {
   }
 
   @Delete(':id')
-  @HttpCode(HttpStatus.NO_CONTENT)
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Remover uma Pessoa por ID' })
   @ApiResponse({ status: 204, description: 'Pessoa removida com sucesso' })
   @ApiResponse({
@@ -206,5 +201,6 @@ export class PersonController extends PrismaService {
   })
   async deletePerson(@Param('id', ParseIntPipe) id: number) {
     await this.personService.deletePerson({ id });
+    return { success: true };
   }
 }

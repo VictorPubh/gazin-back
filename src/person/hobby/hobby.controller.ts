@@ -14,7 +14,6 @@ import {
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/auth/jwt-auth.guard';
 import { NotFoundPerson } from '../dto/bad-request-person.dto';
-import { HobbiesEntity } from '../entity/hobbies.entity';
 import { AddNewHobby, UpdateHobby } from './dto/hobby.dto';
 import { BadRequestHobby, NotFoundHobby } from './dto/bad-request-hobby.dto';
 import { ResponseCreatedHobby } from './dto/response-hobby.dto';
@@ -38,7 +37,7 @@ export class HobbyController extends HobbyService {
   @ApiResponse({
     status: 200,
     description: 'Recebido com sucesso!',
-    type: HobbiesEntity,
+    type: HobbyEntity,
     isArray: true,
   })
   async getAll(
