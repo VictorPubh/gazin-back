@@ -48,6 +48,12 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
+## Running the Swagger
+
+After running the application, access "https://localhost:3000/api".
+
+![Swagger UI](https://i.imgur.com/oBC6mKS.png 'Swagger UI')
+
 ## Test
 
 ```bash
