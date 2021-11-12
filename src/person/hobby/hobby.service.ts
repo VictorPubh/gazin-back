@@ -22,8 +22,8 @@ export class HobbyService extends PrismaService {
   }): Promise<Hobby[]> {
     const { skip, take, cursor, where, orderBy } = params;
     return await this.hobby.findMany({
-      skip,
-      take,
+      skip: skip ? skip : undefined,
+      take: take ? take : undefined,
       cursor,
       where,
       orderBy,

@@ -70,8 +70,8 @@ export class PersonService extends PrismaService {
   }): Promise<Person[]> {
     const { skip, take, cursor, where, orderBy } = params;
     const result = await this.person.findMany({
-      skip,
-      take,
+      skip: skip ? skip : undefined,
+      take: take ? take : undefined,
       cursor,
       where,
       orderBy,

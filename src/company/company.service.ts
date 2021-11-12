@@ -33,8 +33,8 @@ export class CompanyService {
     const { skip, take, cursor, where, orderBy } = params;
 
     return this.prisma.company.findMany({
-      skip,
-      take,
+      skip: skip ? skip : undefined,
+      take: take ? take : undefined,
       cursor,
       where,
       orderBy,
