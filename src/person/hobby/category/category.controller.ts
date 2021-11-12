@@ -81,10 +81,8 @@ export class CategoryController extends CategoryService {
   async addCategory(
     @Body() addNewCategory: AddNewCategory,
   ): Promise<HobbiesCategory> {
-    const { name } = addNewCategory;
-
     return this.createCategory({
-      name,
+      ...addNewCategory,
     });
   }
 

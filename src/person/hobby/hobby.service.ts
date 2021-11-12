@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 
 import { Hobby, Prisma } from '@prisma/client';
@@ -29,9 +33,19 @@ export class HobbyService extends PrismaService {
   async getHobby(
     hobbyWhereUniqueInput: Prisma.HobbyWhereUniqueInput,
   ): Promise<Hobby | null> {
-    return this.hobby.findUnique({
-      where: hobbyWhereUniqueInput,
-    });
+    try {
+      const findHobby = this.hobby.findUnique({
+        where: hobbyWhereUniqueInput,
+      });
+
+      if (findHobby) {
+        return findHobby;
+      } else {
+        throw new NotFoundException();
+      }
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
   async createHobby(data: Prisma.HobbyCreateInput): Promise<Hobby> {
@@ -44,11 +58,15 @@ export class HobbyService extends PrismaService {
     where: Prisma.HobbyWhereUniqueInput;
     data: Prisma.HobbyUpdateInput;
   }): Promise<Hobby> {
-    const { where, data } = params;
-    return this.hobby.update({
-      data,
-      where,
-    });
+    try {
+      const { where, data } = params;
+      return this.hobby.update({
+        data,
+        where,
+      });
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
   async deleteHobby(where: Prisma.HobbyWhereUniqueInput): Promise<Hobby> {

@@ -32,9 +32,13 @@ export class CategoryService extends PrismaService {
   async createCategory(
     data: Prisma.HobbiesCategoryCreateInput,
   ): Promise<HobbiesCategory> {
-    return this.hobbiesCategory.create({
-      data,
-    });
+    try {
+      return this.hobbiesCategory.create({
+        data,
+      });
+    } catch (error) {
+      throw new NotFoundException(error.message);
+    }
   }
 
   async updateCategory(params: {

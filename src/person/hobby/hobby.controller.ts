@@ -7,6 +7,7 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  ParseIntPipe,
   Post,
   Put,
 } from '@nestjs/common';
@@ -121,7 +122,7 @@ export class HobbyController extends HobbyService {
     required: true,
   })
   async updateHobbyName(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateHobby: UpdateHobby,
   ): Promise<Hobby> {
     const { name, category } = updateHobby;
@@ -133,7 +134,7 @@ export class HobbyController extends HobbyService {
           connect: { id: category },
         },
       },
-      where: { id: +id },
+      where: { id },
     });
   }
 
