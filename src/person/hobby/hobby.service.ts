@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 
 import { Hobby, Prisma } from '@prisma/client';
@@ -52,8 +52,12 @@ export class HobbyService extends PrismaService {
   }
 
   async deleteHobby(where: Prisma.HobbyWhereUniqueInput): Promise<Hobby> {
-    return this.hobby.delete({
-      where,
-    });
+    try {
+      return this.hobby.delete({
+        where,
+      });
+    } catch (error) {
+      throw new NotFoundException(error.message);
+    }
   }
 }

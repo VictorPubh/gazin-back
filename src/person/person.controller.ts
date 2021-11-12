@@ -83,7 +83,7 @@ export class PersonController extends PrismaService {
   }
 
   @Public()
-  @Post('/')
+  @Post()
   @ApiOperation({ summary: 'Criar uma Pessoa' })
   @ApiResponse({
     status: 201,
@@ -128,7 +128,7 @@ export class PersonController extends PrismaService {
   }
 
   @Put(':id')
-  @ApiOperation({ summary: 'Atualizar Pessoa' })
+  @ApiOperation({ summary: 'Atualizar Pessoa por ID' })
   @ApiResponse({
     status: 200,
     description: 'Pessoa Atualizado com sucesso!',
@@ -192,7 +192,7 @@ export class PersonController extends PrismaService {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Remover uma Pessoa' })
+  @ApiOperation({ summary: 'Remover uma Pessoa por ID' })
   @ApiResponse({ status: 204, description: 'Pessoa removida com sucesso' })
   @ApiResponse({
     status: 404,

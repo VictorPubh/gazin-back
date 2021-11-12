@@ -4,17 +4,42 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Post,
   Put,
 } from '@nestjs/common';
+import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/auth/jwt-auth.guard';
+import { NotFoundPerson } from '../dto/bad-request-person.dto';
+import { HobbiesEntity } from '../entity/hobbies.entity';
+import { AddNewHobby, UpdateHobby } from './dto/hobby.dto';
+import { BadRequestHobby, NotFoundHobby } from './dto/bad-request-hobby.dto';
+import { ResponseCreateHobby } from './dto/response-hobby.dto';
 import { HobbyService } from './hobby.service';
+import { HobbyEntity } from './entity/hobby.entity';
 
-@Controller('hobby|hobbies')
+@ApiTags('Hobbies')
+@Controller('hobby')
 export class HobbyController extends HobbyService {
   @Public()
-  @Get('/')
+  @Get()
+  @ApiParam({
+    name: 'skip',
+    required: false,
+  })
+  @ApiParam({
+    name: 'take',
+    required: false,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Recebido com sucesso!',
+    type: HobbiesEntity,
+    isArray: true,
+  })
+  @ApiOperation({ summary: 'Receber lista de Hobbies' })
   async getAll(
     @Param('skip') skip: number,
     @Param('take') take: number,
@@ -31,15 +56,20 @@ export class HobbyController extends HobbyService {
     });
   }
 
-  @Post('/')
-  async addHobby(
-    @Body()
-    postData: {
-      name: string;
-      category?: number;
-    },
-  ): Promise<Hobby> {
-    const { name, category } = postData;
+  @Post()
+  @ApiResponse({
+    status: 201,
+    description: 'Criado com sucesso!',
+    type: ResponseCreateHobby,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Argumentos inválidos!',
+    type: BadRequestHobby,
+  })
+  @ApiOperation({ summary: 'Criar novo Hobby' })
+  async addHobby(@Body() addNewHobby: AddNewHobby): Promise<Hobby> {
+    const { name, category } = addNewHobby;
 
     return this.createHobby({
       name,
@@ -50,23 +80,51 @@ export class HobbyController extends HobbyService {
   }
 
   @Public()
-  @Get('/:id')
+  @Get(':id')
+  @ApiOperation({ summary: 'Receber Hobby por ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Receber Objeto de Pessoa',
+    type: HobbyEntity,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Nenhuma Pessoa encontrado',
+    type: BadRequestHobby,
+  })
   async getById(@Param('id') id: number): Promise<Hobby> {
     return this.getHobby({
       id: +id,
     });
   }
 
-  @Put('/:id')
+  @Put(':id')
+  @ApiOperation({ summary: 'Atualizar Hobby por ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Pessoa Atualizado com sucesso!',
+    type: ResponseCreateHobby,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Argumentos inválidos!',
+    type: BadRequestHobby,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Pessoa não encontrado.',
+    type: NotFoundPerson,
+  })
+  @ApiParam({
+    name: 'id',
+    type: 'number',
+    required: true,
+  })
   async updateHobbyName(
     @Param('id') id: string,
-    @Body()
-    postData: {
-      name: string;
-      category?: number;
-    },
+    @Body() updateHobby: UpdateHobby,
   ): Promise<Hobby> {
-    const { name, category } = postData;
+    const { name, category } = updateHobby;
 
     return this.updateHobby({
       data: {
@@ -80,7 +138,20 @@ export class HobbyController extends HobbyService {
   }
 
   @Delete('/:id')
-  async deleteHobbyById(@Param('id') id: string): Promise<Hobby> {
-    return this.deleteHobby({ id: +id });
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Remover um Hobby por ID' })
+  @ApiResponse({ status: 204, description: 'Hobby removido com sucesso' })
+  @ApiResponse({
+    status: 404,
+    description: 'Hobby não foi encontrada',
+    type: NotFoundHobby,
+  })
+  @ApiParam({
+    name: 'id',
+    type: 'number',
+    required: true,
+  })
+  async deleteHobbyById(@Param('id') id: string): Promise<void> {
+    await this.deleteHobby({ id: +id });
   }
 }
