@@ -27,8 +27,8 @@ import { PersonService } from './person.service';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const moment = require('moment');
 
+@ApiTags('Peoples')
 @Controller('person')
-@ApiTags('Person')
 export class PersonController extends PrismaService {
   constructor(private readonly personService: PersonService) {
     super();
@@ -198,6 +198,11 @@ export class PersonController extends PrismaService {
     status: 404,
     description: 'Pessoa não foi encontrada',
     type: NotFoundPerson,
+  })
+  @ApiParam({
+    name: 'id',
+    type: 'number',
+    required: true,
   })
   async deletePerson(@Param('id', ParseIntPipe) id: number) {
     await this.personService.deletePerson({ id });

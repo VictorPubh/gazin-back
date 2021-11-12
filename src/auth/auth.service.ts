@@ -1,7 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
-import { Person, Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { PersonService } from 'src/person/person.service';
 import { SignIn } from './dto/signIn.dto';
 
@@ -19,13 +24,13 @@ export class AuthService extends PersonService {
     try {
       const userToken = await this.jwtService.verify(token);
       const { email }: Prisma.PersonWhereUniqueInput = userToken;
-      if (email) {
+      if (userToken) {
         const user = await this.getPerson({ email });
         return user ? user : false;
       }
       return false;
     } catch (err) {
-      return { ...err };
+      throw new BadRequestException(err.message);
     }
   }
 
@@ -40,11 +45,9 @@ export class AuthService extends PersonService {
         return result;
       }
 
-      // Incorrect password
-      return { err: 'Senha incorreta.', statusCode: 401 };
+      throw new UnauthorizedException();
     } catch (err) {
-      // E-mail not found
-      return { err: 'E-mail não encontrado', statusCode: 404 };
+      throw new NotFoundException();
     }
   }
 
@@ -66,8 +69,7 @@ export class AuthService extends PersonService {
         };
       }
     } catch (err) {
-      // Not authenticated
-      return { err: 'Não autenticado.', statusCode: 400 };
+      throw new BadRequestException();
     }
   }
 }

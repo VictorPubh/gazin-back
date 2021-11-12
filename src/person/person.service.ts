@@ -57,7 +57,7 @@ export class PersonService extends PrismaService {
         throw new NotFoundException('Nenhum encontrado.');
       }
     } catch (error) {
-      throw new NotFoundException(error.message);
+      throw new BadRequestException(error.message);
     }
   }
 
