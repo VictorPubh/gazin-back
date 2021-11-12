@@ -1,5 +1,5 @@
 import { HobbiesCategory, Prisma } from '.prisma/client';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
@@ -51,8 +51,12 @@ export class CategoryService extends PrismaService {
   async deleteCategory(
     where: Prisma.HobbiesCategoryWhereUniqueInput,
   ): Promise<HobbiesCategory> {
-    return this.hobbiesCategory.delete({
-      where,
-    });
+    try {
+      return await this.hobbiesCategory.delete({
+        where,
+      });
+    } catch (error) {
+      throw new NotFoundException(error.message);
+    }
   }
 }

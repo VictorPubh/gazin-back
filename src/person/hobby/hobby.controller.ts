@@ -16,7 +16,7 @@ import { NotFoundPerson } from '../dto/bad-request-person.dto';
 import { HobbiesEntity } from '../entity/hobbies.entity';
 import { AddNewHobby, UpdateHobby } from './dto/hobby.dto';
 import { BadRequestHobby, NotFoundHobby } from './dto/bad-request-hobby.dto';
-import { ResponseCreateHobby } from './dto/response-hobby.dto';
+import { ResponseCreatedHobby } from './dto/response-hobby.dto';
 import { HobbyService } from './hobby.service';
 import { HobbyEntity } from './entity/hobby.entity';
 
@@ -25,6 +25,7 @@ import { HobbyEntity } from './entity/hobby.entity';
 export class HobbyController extends HobbyService {
   @Public()
   @Get()
+  @ApiOperation({ summary: 'Receber lista de Hobbies' })
   @ApiParam({
     name: 'skip',
     required: false,
@@ -39,7 +40,6 @@ export class HobbyController extends HobbyService {
     type: HobbiesEntity,
     isArray: true,
   })
-  @ApiOperation({ summary: 'Receber lista de Hobbies' })
   async getAll(
     @Param('skip') skip: number,
     @Param('take') take: number,
@@ -57,17 +57,17 @@ export class HobbyController extends HobbyService {
   }
 
   @Post()
+  @ApiOperation({ summary: 'Criar novo Hobby' })
   @ApiResponse({
     status: 201,
     description: 'Criado com sucesso!',
-    type: ResponseCreateHobby,
+    type: ResponseCreatedHobby,
   })
   @ApiResponse({
     status: 400,
     description: 'Argumentos inválidos!',
     type: BadRequestHobby,
   })
-  @ApiOperation({ summary: 'Criar novo Hobby' })
   async addHobby(@Body() addNewHobby: AddNewHobby): Promise<Hobby> {
     const { name, category } = addNewHobby;
 
@@ -103,7 +103,7 @@ export class HobbyController extends HobbyService {
   @ApiResponse({
     status: 200,
     description: 'Pessoa Atualizado com sucesso!',
-    type: ResponseCreateHobby,
+    type: ResponseCreatedHobby,
   })
   @ApiResponse({
     status: 400,
